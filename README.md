@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+# digital-marketplace-app
+A  mobile  app  for  direct  farmer-to-buyer  marketplace  built  using  Flutter 
+=======
+>>>>>>> my-work
 # farmer_app
 
 A new Flutter project.
@@ -15,3 +22,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+<<<<<<< HEAD
+=======
+>>>>>>> 099dd25 (Initial commit - basic login and dashboard)
+>>>>>>> my-work
