@@ -6,11 +6,33 @@ class Product {
   String name;
   String price;
   String quantity;
+  String buyerName;
+  String status;
 
-  Product({required this.name, required this.price, required this.quantity});
+  Product({
+    required this.name,
+    required this.price,
+    required this.quantity,
+    this.buyerName = "",
+    this.status = "Pending",
+  });
 }
 
+class Order {
+  String productName;
+  String buyerName;
+  Order({required this.productName, required this.buyerName});
+}
+
+List<Product> orderList = [];
+List<Product> cartList = [];
 List<Product> productList = [];
+List<Order> orderList1 = [];
+final List<Product> products = [
+  Product(name: "Tomato", price: "20/kg", quantity: "1/Kg"),
+  Product(name: "Potatoes", price: "15/kg", quantity: "1kg"),
+  Product(name: "Onion", price: "25/kg", quantity: "1kg"),
+];
 void main() {
   runApp(const MyApp());
 }
@@ -221,7 +243,8 @@ class BuyerTypeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const BuyerDashboard(),
+                    builder: (context) =>
+                        const BuyerDashboard(type: "household"),
                   ),
                 );
               },
@@ -233,7 +256,8 @@ class BuyerTypeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const BuyerDashboard(),
+                    builder: (context) =>
+                        const BuyerDashboard(type: "wholesale"),
                   ),
                 );
               },
@@ -343,25 +367,75 @@ class FarmerDashboard extends StatelessWidget {
 }
 
 class BuyerDashboard extends StatelessWidget {
-  const BuyerDashboard({super.key});
+  final String type; // "household" or "wholesale"
+
+  const BuyerDashboard({super.key, required this.type});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Buyer Dashboard"),
+        title: Text("Buyer Dashboard ($type)"),
         backgroundColor: Colors.orange,
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const BuyerProductsScreen(),
-              ),
-            );
-          },
-          child: const Text("View Products"),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 15,
+          mainAxisSpacing: 15,
+          children: [
+            dashboardItem(context, "Search", Icons.search, () {}),
+            dashboardItem(context, "Browse Products", Icons.store, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BrowseProductsScreen(),
+                ),
+              );
+            }),
+            dashboardItem(context, "My Orders", Icons.shopping_bag, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyOrderScreen()),
+              );
+            }),
+            dashboardItem(context, "Demand Alert", Icons.notifications, () {}),
+            dashboardItem(context, "My Cart", Icons.shopping_cart, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartScreen()),
+              );
+            }),
+
+            if (type == "wholesale")
+              dashboardItem(context, "My Bid", Icons.gavel, () {}),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget dashboardItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.orange.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.orange),
+            const SizedBox(height: 10),
+            Text(title, textAlign: TextAlign.center),
+          ],
         ),
       ),
     );
@@ -507,7 +581,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const BuyerRegisterScreen(type: "Household"),
+                      const BuyerRegisterScreen(type: "household"),
                 ),
               );
             },
@@ -520,7 +594,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const BuyerRegisterScreen(type: "Wholesale"),
+                      const BuyerRegisterScreen(type: "wholesale"),
                 ),
               );
             },
@@ -627,7 +701,9 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const BuyerDashboard()),
+      MaterialPageRoute(
+        builder: (context) => BuyerDashboard(type: widget.type),
+      ),
     );
   }
 
@@ -812,8 +888,33 @@ class OrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Order Received")),
-      body: const Center(child: Text("No orders yet")),
+      appBar: AppBar(
+        title: const Text("Order Received"),
+        backgroundColor: Colors.orange,
+      ),
+      body: orderList.isEmpty
+          ? const Center(child: Text("No orders yet"))
+          : ListView.builder(
+              itemCount: orderList.length,
+              itemBuilder: (context, index) {
+                final order = orderList[index];
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  child: ListTile(
+                    title: Text(order.name),
+                    subtitle: Text(
+                      "${order.price} | Qty: ${order.quantity}\nBuyer:${order.buyerName}\nStatus:${order.status}",
+                    ),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        order.status = "Delivered";
+                      },
+                      child: Text("Mark Delivered"),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
@@ -823,7 +924,7 @@ class DemandScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Buyer Demand")),
+      appBar: AppBar(title: const Text("Buyer OrderDemand")),
       body: const Center(child: Text("No Demand data yet")),
     );
   }
@@ -907,6 +1008,162 @@ class BuyerProductsScreen extends StatelessWidget {
                         );
                       },
                       child: const Text("Buy"),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+class BrowseProductsScreen extends StatelessWidget {
+  const BrowseProductsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Browse Products")),
+      body: ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+
+          return Card(
+            margin: const EdgeInsets.all(10),
+            child: ListTile(
+              title: Text(product.name),
+              subtitle: Text(
+                "Price: ₹${product.price} | Qty: ${product.quantity}",
+              ),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  cartList.add(product);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("${product.name} added to cart")),
+                  );
+                },
+                child: const Text("Add"),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class CartScreen extends StatelessWidget {
+  const CartScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("My Cart"),
+        backgroundColor: Colors.orange,
+      ),
+      body: cartList.isEmpty
+          ? const Center(child: Text("Cart is Empty"))
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: cartList.length,
+                    itemBuilder: (context, index) {
+                      final product = cartList[index];
+                      return Card(
+                        margin: const EdgeInsets.all(10),
+                        child: ListTile(
+                          title: Text(product.name),
+                          subtitle: Text(
+                            "${product.price}|Qty:${product.quantity}",
+                          ),
+
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  int qty = int.parse(
+                                    product.quantity.replaceAll("kg", ""),
+                                  );
+                                  if (qty > 1) qty--;
+                                  product.quantity = "${qty}kg";
+                                  (context as Element).markNeedsBuild();
+                                },
+                              ),
+                              Text(product.quantity),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  int qty = int.parse(
+                                    product.quantity.replaceAll("kg", ""),
+                                  );
+                                  qty++;
+                                  product.quantity = "${qty}kg";
+                                  (context as Element).markNeedsBuild();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsGeometry.all(15),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        for (var item in cartList) {
+                          orderList.add(
+                            Product(
+                              name: item.name,
+                              price: item.price,
+                              quantity: item.quantity,
+                              buyerName: "Ram",
+                            ),
+                          );
+                        }
+                        cartList.clear();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Order Placed")),
+                        );
+                      },
+                      child: const Text("Place Order"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class MyOrderScreen extends StatelessWidget {
+  const MyOrderScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("My Orders"),
+        backgroundColor: Colors.orange,
+      ),
+      body: orderList.isEmpty
+          ? const Center(child: Text("No orders yet"))
+          : ListView.builder(
+              itemCount: orderList.length,
+              itemBuilder: (context, index) {
+                final product = orderList[index];
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  child: ListTile(
+                    title: Text(product.name),
+                    subtitle: Text(
+                      "${product.price} | Qty:${product.quantity}",
                     ),
                   ),
                 );
