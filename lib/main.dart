@@ -8,6 +8,7 @@ class Product {
   String quantity;
   String buyerName;
   String status;
+  int cartQty;
 
   Product({
     required this.name,
@@ -15,6 +16,7 @@ class Product {
     required this.quantity,
     this.buyerName = "",
     this.status = "Pending",
+    this.cartQty = 1,
   });
 }
 
@@ -24,15 +26,12 @@ class Order {
   Order({required this.productName, required this.buyerName});
 }
 
+List<Map<String, String>> orderlist = [];
 List<Product> orderList = [];
 List<Product> cartList = [];
 List<Product> productList = [];
 List<Order> orderList1 = [];
-final List<Product> products = [
-  Product(name: "Tomato", price: "20/kg", quantity: "1/Kg"),
-  Product(name: "Potatoes", price: "15/kg", quantity: "1kg"),
-  Product(name: "Onion", price: "25/kg", quantity: "1kg"),
-];
+final products = productList;
 void main() {
   runApp(const MyApp());
 }
@@ -1023,32 +1022,55 @@ class BrowseProductsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Browse Products")),
-      body: ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-
-          return Card(
-            margin: const EdgeInsets.all(10),
-            child: ListTile(
-              title: Text(product.name),
-              subtitle: Text(
-                "Price: ₹${product.price} | Qty: ${product.quantity}",
-              ),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  cartList.add(product);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("${product.name} added to cart")),
-                  );
-                },
-                child: const Text("Add"),
-              ),
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: const Text("Browse Products"),
+        backgroundColor: Colors.orange,
       ),
+      body: productList.isEmpty
+          ? const Center(
+              child: Text(
+                "No products available",
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: productList.length,
+              itemBuilder: (context, index) {
+                final product = productList[index];
+
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  elevation: 4,
+                  child: ListTile(
+                    title: Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "Price: ₹${product.price} | Qty: ${product.quantity}",
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(
+                        Icons.add_shopping_cart,
+                        color: Colors.green,
+                      ),
+                      onPressed: () {
+                        product.cartQty = 1;
+                        cartList.add(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("${product.name} added to cart"),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
