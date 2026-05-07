@@ -1121,7 +1121,7 @@ class _MarketScreenState extends State<MarketScreen> {
           children: [
             /// SELECT PRODUCT
             DropdownButtonFormField<Product>(
-              value: selectedProduct,
+              initialValue: selectedProduct,
               hint: const Text("Select Product"),
               items: productList.map((product) {
                 return DropdownMenuItem(
