@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:farmer_app/main.dart';
+import 'app_text.dart';
+
+String tr(BuildContext context, String key) {
+  String lang = Localizations.localeOf(context).languageCode;
+  return AppText.translations[lang]?[key] ?? key;
+}
 
 String? userRole;
 
@@ -64,13 +69,43 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+  static _MyAppState? of(BuildContext context) {
+    return context.findAncestorStateOfType<_MyAppState>();
+  }
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = const Locale('en');
+
+  void changeLanguage(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      locale: _locale,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('kn'),
+        Locale('hi'),
+        Locale('te'),
+        Locale('ta'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      home: const LoginScreen(),
     );
   }
 }
@@ -192,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const RegisterRoleScreen(),
+                    builder: (context) => const LanguageSelectionScreen(),
                   ),
                 );
               },
@@ -303,7 +338,7 @@ class FarmerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Farmer Dashboard"),
+        title: Text(tr(context, "farmer_dashboard")),
         backgroundColor: Colors.green,
       ),
       body: Padding(
@@ -315,49 +350,49 @@ class FarmerDashboard extends StatelessWidget {
           children: [
             dashboardItem(
               context,
-              "Add Product",
+              tr(context, 'add_product'),
               Icons.add,
               Colors.green,
               const AddProductScreen(),
             ),
             dashboardItem(
               context,
-              "My Product",
+              tr(context, 'my_product'),
               Icons.inventory,
               Colors.blue,
               const ProductListScreen(),
             ),
             dashboardItem(
               context,
-              "Orders Received",
+              tr(context, 'orders_received'),
               Icons.shopping_cart,
               Colors.orange,
               const OrderScreen(),
             ),
             dashboardItem(
               context,
-              "Buyer Demand",
+              tr(context, 'buyer_demand'),
               Icons.show_chart,
               Colors.purple,
               const DemandScreen(),
             ),
             dashboardItem(
               context,
-              "Sell Directly To Market",
+              tr(context, 'sell_market'),
               Icons.store,
               Colors.teal,
               const MarketScreen(),
             ),
             dashboardItem(
               context,
-              "View Bids",
+              tr(context, 'view_Bids'),
               Icons.gavel,
               Colors.green,
               const ViewBidsScreen(),
             ),
             dashboardItem(
               context,
-              "Recent Orders",
+              tr(context, 'recent_orders'),
               Icons.history,
               Colors.red,
               const RecentOrderScreen(),
@@ -409,7 +444,7 @@ class BuyerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Buyer Dashboard ($type)"),
+        title: Text("${tr(context, 'buyer_type')}($type)"),
         backgroundColor: Colors.orange,
       ),
       body: Padding(
@@ -419,31 +454,53 @@ class BuyerDashboard extends StatelessWidget {
           crossAxisSpacing: 15,
           mainAxisSpacing: 15,
           children: [
-            dashboardItem(context, "Search", Icons.search, () {}),
-            dashboardItem(context, "Browse Products", Icons.store, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const BrowseProductsScreen(),
-                ),
-              );
-            }),
-            dashboardItem(context, "My Orders", Icons.shopping_bag, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyOrderScreen()),
-              );
-            }),
-            dashboardItem(context, "Demand Alert", Icons.notifications, () {}),
-            dashboardItem(context, "My Cart", Icons.shopping_cart, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CartScreen()),
-              );
-            }),
+            dashboardItem(context, tr(context, 'search'), Icons.search, () {}),
+            dashboardItem(
+              context,
+              tr(context, 'browse_product'),
+              Icons.store,
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BrowseProductsScreen(),
+                  ),
+                );
+              },
+            ),
+            dashboardItem(
+              context,
+              tr(context, 'my_order'),
+              Icons.shopping_bag,
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyOrderScreen(),
+                  ),
+                );
+              },
+            ),
+            dashboardItem(
+              context,
+              tr(context, 'demand_alert'),
+              Icons.notifications,
+              () {},
+            ),
+            dashboardItem(
+              context,
+              tr(context, 'my_cart'),
+              Icons.shopping_cart,
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()),
+                );
+              },
+            ),
 
             if (type == "wholesale")
-              dashboardItem(context, "My Bid", Icons.gavel, () {
+              dashboardItem(context, tr(context, 'my_bid'), Icons.gavel, () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MyBidScreen()),
@@ -518,7 +575,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Register"),
+        title: Text(tr(context, 'register')),
         backgroundColor: Colors.green,
       ),
       body: Padding(
@@ -527,24 +584,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: "Full Name"),
+              decoration: InputDecoration(labelText: tr(context, 'name')),
             ),
             const SizedBox(height: 15),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: InputDecoration(labelText: tr(context, 'email')),
             ),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: "Password"),
+              decoration: InputDecoration(labelText: tr(context, 'password')),
             ),
             const SizedBox(height: 25),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: register,
-                child: const Text("Register"),
+                child: Text(tr(context, 'register')),
               ),
             ),
           ],
@@ -609,7 +666,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Buyer Type"),
+        title: Text(tr(context, 'buyer_type')),
         backgroundColor: Colors.orange,
       ),
       body: Column(
@@ -624,7 +681,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
                 ),
               );
             },
-            child: const Text("Household 🏠"),
+            child: Text("${tr(context, 'household')} 🏠"),
           ),
 
           ElevatedButton(
@@ -637,7 +694,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
                 ),
               );
             },
-            child: const Text("Wholesale 🏪"),
+            child: Text("${tr(context, 'wholesale')} 🏪"),
           ),
         ],
       ),
@@ -675,40 +732,45 @@ class _FarmerRegisterScreenState extends State<FarmerRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Farmer Register")),
+      appBar: AppBar(title: Text(tr(context, 'farmer_register'))),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: "Name"),
+              decoration: InputDecoration(labelText: tr(context, 'name')),
             ),
 
             TextField(
               controller: farmController,
-              decoration: const InputDecoration(labelText: "Farm Location"),
+              decoration: InputDecoration(
+                labelText: tr(context, 'farm_location'),
+              ),
             ),
             TextField(
               controller: phoneController,
-              decoration: const InputDecoration(labelText: "Phone Number"),
+              decoration: InputDecoration(labelText: tr(context, 'phone_no')),
             ),
             TextField(
               controller: locationController,
-              decoration: const InputDecoration(labelText: "Location"),
+              decoration: InputDecoration(labelText: tr(context, 'location')),
             ),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: InputDecoration(labelText: tr(context, 'email')),
             ),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: "Password"),
+              decoration: InputDecoration(labelText: tr(context, 'password')),
             ),
 
             const SizedBox(height: 20),
 
-            ElevatedButton(onPressed: register, child: const Text("Register")),
+            ElevatedButton(
+              onPressed: register,
+              child: Text(tr(context, 'register')),
+            ),
           ],
         ),
       ),
@@ -734,9 +796,11 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
 
   void register() {
     userRole = "buyer";
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("${widget.type} Buyer Registered")));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("${widget.type} ${tr(context, 'buyer_registerd')}"),
+      ),
+    );
 
     Navigator.push(
       context,
@@ -749,35 +813,38 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("${widget.type} Register")),
+      appBar: AppBar(title: Text("${widget.type}${tr(context, 'register')}")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: "Name"),
+              decoration: InputDecoration(labelText: tr(context, 'name')),
             ),
             TextField(
               controller: phoneController,
-              decoration: const InputDecoration(labelText: "Phone Number"),
+              decoration: InputDecoration(labelText: tr(context, 'phone_no')),
             ),
             TextField(
               controller: addressController,
-              decoration: const InputDecoration(labelText: "Address"),
+              decoration: InputDecoration(labelText: tr(context, 'address')),
             ),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: InputDecoration(labelText: tr(context, 'email')),
             ),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: "Password"),
+              decoration: InputDecoration(labelText: tr(context, 'password')),
             ),
 
             const SizedBox(height: 20),
 
-            ElevatedButton(onPressed: register, child: const Text("Register")),
+            ElevatedButton(
+              onPressed: register,
+              child: Text(tr(context, 'register')),
+            ),
           ],
         ),
       ),
@@ -811,9 +878,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
     String qty = quantityController.text.trim();
 
     if (name.isEmpty || price.isEmpty || qty.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please Fill all fields & image")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(tr(context, 'fill_fields'))));
       return;
     }
     productList.add(
@@ -822,7 +889,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text("Product Added Successfully")));
+    ).showSnackBar(SnackBar(content: Text(tr(context, 'product_added'))));
     nameController.clear();
     priceController.clear();
     quantityController.clear();
@@ -836,7 +903,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Product"),
+        title: Text(tr(context, 'add_product')),
         backgroundColor: Colors.green,
       ),
       body: SingleChildScrollView(
@@ -854,12 +921,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   border: Border.all(color: Colors.green),
                 ),
                 child: _image == null
-                    ? const Column(
+                    ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.camera_alt, size: 50),
                           SizedBox(height: 10),
-                          Text("Upload Product Image"),
+                          Text(tr(context, 'upload_image')),
                         ],
                       )
                     : ClipRRect(
@@ -872,7 +939,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             TextField(
               controller: nameController,
               decoration: InputDecoration(
-                labelText: "Product Name",
+                labelText: tr(context, 'product_name'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -883,7 +950,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               controller: priceController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "Price",
+                labelText: tr(context, 'price'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -894,7 +961,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               controller: quantityController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "Quantity",
+                labelText: tr(context, 'quantity'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -912,8 +979,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  "Add Product",
+                child: Text(
+                  tr(context, 'add_product'),
                   style: TextStyle(fontSize: 16),
                 ),
               ),
@@ -931,12 +998,15 @@ class ProductListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Product"),
+        title: Text(tr(context, 'my_product')),
         backgroundColor: Colors.green,
       ),
       body: productList.isEmpty
-          ? const Center(
-              child: Text("No Products Added", style: TextStyle(fontSize: 16)),
+          ? Center(
+              child: Text(
+                tr(context, 'no_product'),
+                style: TextStyle(fontSize: 16),
+              ),
             )
           : ListView.builder(
               itemCount: productList.length,
@@ -981,8 +1051,10 @@ class ProductListScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              Text("Price:${product.price}"),
-                              Text("Quantity : ${product.quantity}"),
+                              Text("${tr(context, 'price')}:${product.price}"),
+                              Text(
+                                "${tr(context, 'quantity')} : ${product.quantity}",
+                              ),
                             ],
                           ),
                         ),
@@ -1009,11 +1081,11 @@ class OrderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Order Received"),
+        title: Text(tr(context, 'order_received')),
         backgroundColor: Colors.orange,
       ),
       body: orderList.isEmpty
-          ? const Center(child: Text("No orders yet"))
+          ? Center(child: Text(tr(context, 'no_order')))
           : ListView.builder(
               itemCount: orderList.length,
               itemBuilder: (context, index) {
@@ -1023,13 +1095,13 @@ class OrderScreen extends StatelessWidget {
                   child: ListTile(
                     title: Text(order.name),
                     subtitle: Text(
-                      "${order.price} | Qty: ${order.quantity}\nBuyer:${order.buyerName}\nStatus:${order.status}",
+                      "${order.price} |${tr(context, 'quantity')} :${order.quantity}\n${tr(context, 'buyer')}:${order.buyerName}\n${tr(context, 'status')}:${order.status}",
                     ),
                     trailing: ElevatedButton(
                       onPressed: () {
-                        order.status = "Delivered";
+                        order.status = tr(context, 'delevierd');
                       },
-                      child: Text("Mark Delivered"),
+                      child: Text(tr(context, 'mark_delivered')),
                     ),
                   ),
                 );
@@ -1046,10 +1118,10 @@ class DemandScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Buyer Demand"),
+        title: Text(tr(context, 'buyer_demand')),
         backgroundColor: Colors.green,
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1058,16 +1130,13 @@ class DemandScreen extends StatelessWidget {
             SizedBox(height: 20),
 
             Text(
-              "No buyer demands yet",
+              tr(context, 'no_demands_yet'),
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
 
             SizedBox(height: 10),
 
-            Text(
-              "You will see requests from buyers here",
-              style: TextStyle(color: Colors.grey),
-            ),
+            Text(tr(context, 'you_see'), style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),
@@ -1088,9 +1157,9 @@ class _MarketScreenState extends State<MarketScreen> {
 
   void addToMarket() {
     if (selectedProduct == null || priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Select product & enter price")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(tr(context, 'select'))));
       return;
     }
 
@@ -1111,7 +1180,7 @@ class _MarketScreenState extends State<MarketScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sell to Market"),
+        title: Text(tr(context, 'sell_market')),
         backgroundColor: Colors.green,
       ),
 
@@ -1122,7 +1191,7 @@ class _MarketScreenState extends State<MarketScreen> {
             /// SELECT PRODUCT
             DropdownButtonFormField<Product>(
               value: selectedProduct,
-              hint: const Text("Select Product"),
+              hint: Text(tr(context, 'select_product')),
               items: productList.map((product) {
                 return DropdownMenuItem(
                   value: product,
@@ -1143,7 +1212,7 @@ class _MarketScreenState extends State<MarketScreen> {
               controller: priceController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "Enter Price",
+                labelText: tr(context, 'enter_price'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -1158,7 +1227,7 @@ class _MarketScreenState extends State<MarketScreen> {
               child: ElevatedButton(
                 onPressed: addToMarket,
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: const Text("Sell Now"),
+                child: Text(tr(context, 'sell_now')),
               ),
             ),
 
@@ -1167,7 +1236,7 @@ class _MarketScreenState extends State<MarketScreen> {
             /// MARKET LIST
             Expanded(
               child: marketList.isEmpty
-                  ? const Center(child: Text("No market listings yet"))
+                  ? Center(child: Text(tr(context, 'no_list')))
                   : ListView.builder(
                       itemCount: marketList.length,
                       itemBuilder: (context, index) {
@@ -1177,7 +1246,9 @@ class _MarketScreenState extends State<MarketScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.store),
                             title: Text(item.productName),
-                            subtitle: Text("Price: ₹${item.price}"),
+                            subtitle: Text(
+                              "${tr(context, 'price')}: ₹${item.price}",
+                            ),
                             trailing: const Icon(Icons.chevron_right),
                           ),
                         );
@@ -1220,11 +1291,11 @@ class BuyerProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Available Products"),
+        title: Text(tr(context, 'available_product')),
         backgroundColor: Colors.orange,
       ),
       body: productList.isEmpty
-          ? const Center(child: Text("No products available"))
+          ? Center(child: Text(tr(context, 'no_product')))
           : ListView.builder(
               itemCount: productList.length,
               itemBuilder: (context, index) {
@@ -1235,7 +1306,7 @@ class BuyerProductsScreen extends StatelessWidget {
                   child: ListTile(
                     title: Text(product.name),
                     subtitle: Text(
-                      "Price: ₹${product.price} | Qty: ${product.quantity} kg",
+                      "${tr(context, 'price')}: ₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity} ${tr(context, 'kg')}",
                     ),
 
                     trailing: ElevatedButton(
@@ -1243,12 +1314,12 @@ class BuyerProductsScreen extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              "${product.name} ordered successfully",
+                              "${product.name} ${tr(context, 'order_successfully')}",
                             ),
                           ),
                         );
                       },
-                      child: const Text("Buy"),
+                      child: Text(tr(context, 'buy')),
                     ),
                   ),
                 );
@@ -1265,13 +1336,13 @@ class BrowseProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Browse Products"),
+        title: Text(tr(context, 'browse_product')),
         backgroundColor: Colors.orange,
       ),
       body: productList.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
-                "No products available",
+                tr(context, 'no_product'),
                 style: TextStyle(fontSize: 18),
               ),
             )
@@ -1292,7 +1363,7 @@ class BrowseProductsScreen extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      "Price: ₹${product.price} | Qty: ${product.quantity}",
+                      "${tr(context, 'price')}: ₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity}",
                     ),
                     trailing: IconButton(
                       icon: const Icon(
@@ -1304,7 +1375,9 @@ class BrowseProductsScreen extends StatelessWidget {
                         cartList.add(product);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("${product.name} added to cart"),
+                            content: Text(
+                              "${product.name} ${tr(context, 'added_to_cart')}",
+                            ),
                           ),
                         );
                       },
@@ -1323,11 +1396,11 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Cart"),
+        title: Text(tr(context, 'my_cart')),
         backgroundColor: Colors.orange,
       ),
       body: cartList.isEmpty
-          ? const Center(child: Text("Cart is Empty"))
+          ? Center(child: Text(tr(context, 'cart_is_empty')))
           : Column(
               children: [
                 Expanded(
@@ -1340,7 +1413,7 @@ class CartScreen extends StatelessWidget {
                         child: ListTile(
                           title: Text(product.name),
                           subtitle: Text(
-                            "${product.price}|Qty:${product.quantity}",
+                            "${product.price}${tr(context, 'quantity')}:${product.quantity}",
                           ),
 
                           trailing: Row(
@@ -1394,10 +1467,10 @@ class CartScreen extends StatelessWidget {
                         }
                         cartList.clear();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Order Placed")),
+                          SnackBar(content: Text(tr(context, 'order_placed'))),
                         );
                       },
-                      child: const Text("Place Order"),
+                      child: Text(tr(context, 'place_order')),
                     ),
                   ),
                 ),
@@ -1413,11 +1486,11 @@ class MyOrderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Orders"),
+        title: Text(tr(context, 'my_order')),
         backgroundColor: Colors.orange,
       ),
       body: orderList.isEmpty
-          ? const Center(child: Text("No orders yet"))
+          ? Center(child: Text(tr(context, 'no_order')))
           : ListView.builder(
               itemCount: orderList.length,
               itemBuilder: (context, index) {
@@ -1427,7 +1500,7 @@ class MyOrderScreen extends StatelessWidget {
                   child: ListTile(
                     title: Text(product.name),
                     subtitle: Text(
-                      "${product.price} | Qty:${product.quantity}",
+                      "${product.price} |${tr(context, 'quantity')}:${product.quantity}",
                     ),
                   ),
                 );
@@ -1455,7 +1528,7 @@ class _BidDialogState extends State<BidDialog> {
     bidList.add(
       Bid(
         productName: widget.productName,
-        buyerName: "Buyer", // you can improve later
+        buyerName: tr(context, 'buyer'), // you can improve later
         price: priceController.text,
       ),
     );
@@ -1466,13 +1539,15 @@ class _BidDialogState extends State<BidDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Place Bid - ${widget.productName}"),
+      title: Text("${tr(context, 'place_bid')} - ${widget.productName}"),
       content: TextField(
         controller: priceController,
         keyboardType: TextInputType.number,
-        decoration: const InputDecoration(labelText: "Enter your bid"),
+        decoration: InputDecoration(labelText: tr(context, 'enter_bid')),
       ),
-      actions: [TextButton(onPressed: submitBid, child: const Text("Submit"))],
+      actions: [
+        TextButton(onPressed: submitBid, child: Text(tr(context, 'submit'))),
+      ],
     );
   }
 }
@@ -1495,7 +1570,7 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          "Accepted ₹${acceptedBid.price} for ${acceptedBid.productName}",
+          "${tr(context, 'accepted')} ₹${acceptedBid.price} ${tr(context, 'for')} ${acceptedBid.productName}",
         ),
       ),
     );
@@ -1505,13 +1580,16 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Bids Received"),
+        title: Text(tr(context, 'bids_received')),
         backgroundColor: Colors.green,
       ),
 
       body: bidList.isEmpty
-          ? const Center(
-              child: Text("No bids yet", style: TextStyle(fontSize: 16)),
+          ? Center(
+              child: Text(
+                tr(context, 'no_bids_yet'),
+                style: TextStyle(fontSize: 16),
+              ),
             )
           : ListView.builder(
               itemCount: bidList.length,
@@ -1540,8 +1618,8 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Buyer: ${bid.buyerName}"),
-                        Text("Bid Price: ₹${bid.price}"),
+                        Text("${tr(context, 'buyer')}: ${bid.buyerName}"),
+                        Text("${tr(context, 'bid_price')}: ₹${bid.price}"),
                       ],
                     ),
 
@@ -1550,7 +1628,7 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                       ),
-                      child: const Text("Accept"),
+                      child: Text(tr(context, 'bid_price')),
                     ),
                   ),
                 );
@@ -1575,16 +1653,18 @@ class _MyBidScreenState extends State<MyBidScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Bid for $productName"),
+          title: Text("${tr(context, 'bid_for')} $productName"),
           content: TextField(
             controller: bidController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(hintText: "Enter your bid price"),
+            decoration: InputDecoration(
+              hintText: tr(context, 'enter_bid_price'),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: Text(tr(context, 'cancle')),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1593,7 +1673,7 @@ class _MyBidScreenState extends State<MyBidScreen> {
                 bidList.add(
                   Bid(
                     productName: productName,
-                    buyerName: "Buyer",
+                    buyerName: tr(context, 'buyer'),
                     price: bidController.text,
                   ),
                 );
@@ -1602,10 +1682,12 @@ class _MyBidScreenState extends State<MyBidScreen> {
                 setState(() {}); // refresh UI
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Bid placed successfully")),
+                  SnackBar(
+                    content: Text(tr(context, 'bid_placed_successfully')),
+                  ),
                 );
               },
-              child: const Text("Submit"),
+              child: Text(tr(context, 'submit')),
             ),
           ],
         );
@@ -1617,7 +1699,7 @@ class _MyBidScreenState extends State<MyBidScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Market & My Bids"),
+        title: Text(tr(context, 'market_my_bids')),
         backgroundColor: Colors.orange,
       ),
 
@@ -1626,7 +1708,7 @@ class _MyBidScreenState extends State<MyBidScreen> {
           /// 🔹 MARKET PRODUCTS
           Expanded(
             child: marketList.isEmpty
-                ? const Center(child: Text("No market products available"))
+                ? Center(child: Text(tr(context, 'no_market_product')))
                 : ListView.builder(
                     itemCount: marketList.length,
                     itemBuilder: (context, index) {
@@ -1636,11 +1718,13 @@ class _MyBidScreenState extends State<MyBidScreen> {
                         margin: const EdgeInsets.all(8),
                         child: ListTile(
                           title: Text(item.productName),
-                          subtitle: Text("Base Price: ₹${item.price}"),
+                          subtitle: Text(
+                            "${tr(context, 'base_price')}: ₹${item.price}",
+                          ),
 
                           trailing: ElevatedButton(
                             onPressed: () => openBidDialog(item.productName),
-                            child: const Text("Make Bid"),
+                            child: Text(tr(context, 'make_bid')),
                           ),
                         ),
                       );
@@ -1651,17 +1735,17 @@ class _MyBidScreenState extends State<MyBidScreen> {
           const Divider(),
 
           /// 🔹 MY BIDS SECTION
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(10),
             child: Text(
-              "My Bids",
+              tr(context, 'my_bid'),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
 
           Expanded(
             child: bidList.isEmpty
-                ? const Center(child: Text("No bids placed yet"))
+                ? Center(child: Text(tr(context, 'no_bids_yet')))
                 : ListView.builder(
                     itemCount: bidList.length,
                     itemBuilder: (context, index) {
@@ -1675,13 +1759,103 @@ class _MyBidScreenState extends State<MyBidScreen> {
                             color: Colors.orange,
                           ),
                           title: Text(bid.productName),
-                          subtitle: Text("Your Bid: ₹${bid.price}"),
+                          subtitle: Text(
+                            "${tr(context, 'bid_price')}: ₹${bid.price}",
+                          ),
                         ),
                       );
                     },
                   ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class LanguageSelectionScreen extends StatelessWidget {
+  const LanguageSelectionScreen({super.key});
+
+  void changeAppLanguage(BuildContext context, String languageCode) {
+    MyApp.of(context)?.changeLanguage(Locale(languageCode));
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.green[50],
+
+      appBar: AppBar(
+        title: Text(
+          AppText.translations[Localizations.localeOf(
+                context,
+              ).languageCode]?['select_language'] ??
+              "Select Language",
+        ),
+        backgroundColor: Colors.green,
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+
+        child: Column(
+          children: [
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => changeAppLanguage(context, 'en'),
+                child: const Text("English"),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => changeAppLanguage(context, 'kn'),
+                child: const Text("ಕನ್ನಡ"),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => changeAppLanguage(context, 'hi'),
+                child: const Text("हिन्दी"),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => changeAppLanguage(context, 'te'),
+                child: const Text("తెలుగు"),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => changeAppLanguage(context, 'ta'),
+                child: const Text("தமிழ்"),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
