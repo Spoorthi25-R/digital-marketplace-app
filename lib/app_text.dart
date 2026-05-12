@@ -85,10 +85,14 @@ class AppText {
       'buyers_ordered_this_product': 'Buyers ordered this product',
       'no_demand_alert': 'No Demand Alert',
       'trending': 'Trending',
+      'choose_your_role': 'Choose Your Role',
+      'select_role': 'Select Role',
     },
 
     // KANNADA
     'kn': {
+      'choose_your_role': 'ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+      'select_role': 'ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       'no_demand_alert': 'ಯಾವುದೇ ಬೇಡಿಕೆ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ',
       'trending': 'ಟ್ರೆಂಡಿಂಗ್',
       'high_demand': 'ಹೆಚ್ಚಿನ ಬೇಡಿಕೆ',
@@ -179,6 +183,8 @@ class AppText {
 
     // HINDI
     'hi': {
+      'choose_your_role': 'अपनी भूमिका चुनें',
+      'select_role': 'भूमिका चुनें',
       'high_demand': 'अधिक मांग',
       'buyers_ordered_this_product': 'खरीदारों ने इस उत्पाद का ऑर्डर किया',
       'no_demand_alert': 'कोई मांग अलर्ट नहीं',
@@ -266,6 +272,8 @@ class AppText {
 
     // TELUGU
     'te': {
+      'choose_your_role': 'మీ పాత్రను ఎంచుకోండి',
+      'select_role': 'పాత్రను ఎంచుకోండి',
       'no_demand_alert': 'డిమాండ్ అలర్ట్ లేదు',
       'trending': 'ట్రెండింగ్',
       'high_demand': 'అధిక డిమాండ్',
@@ -439,6 +447,8 @@ class AppText {
       'wholesale': 'மொத்த விற்பனை',
       'no_demand_alert': 'தேவை எச்சரிக்கை இல்லை',
       'trending': 'டிரெண்டிங்',
+      'choose_your_role': 'உங்கள் பாத்திரத்தை தேர்வு செய்யவும்',
+      'select_role': 'பாத்திரத்தை தேர்வு செய்யவும்',
     },
   };
 }

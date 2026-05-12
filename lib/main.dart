@@ -211,7 +211,7 @@ class RoleSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Select Role"),
+        title: Text(tr(context, 'select_role')),
         backgroundColor: Colors.green,
       ),
       body: Padding(
@@ -219,7 +219,10 @@ class RoleSelectionScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            const Text("Choose Your Role", style: TextStyle(fontSize: 22)),
+            Text(
+              tr(context, 'choose_your_role'),
+              style: TextStyle(fontSize: 22),
+            ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
@@ -230,7 +233,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Farmer"),
+              child: Text(tr(context, 'farmer')),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -242,7 +245,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Buyer"),
+              child: Text(tr(context, 'buyer')),
             ),
           ],
         ),
@@ -257,7 +260,7 @@ class BuyerTypeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Buyer Type"),
+        title: Text(tr(context, 'buyer_type')),
         backgroundColor: Colors.orange,
       ),
       body: Padding(
@@ -275,7 +278,7 @@ class BuyerTypeScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Household"),
+              child: Text(tr(context, 'household')),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -288,7 +291,7 @@ class BuyerTypeScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Wholesale"),
+              child: Text(tr(context, 'wholesale')),
             ),
           ],
         ),
