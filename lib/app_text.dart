@@ -79,10 +79,22 @@ class AppText {
       'cancel': 'Cancel',
       'bid_placed_successfully': 'Bid placed successfully',
       'market_and_my_bids': 'Market and my bids',
+      'household': 'Household',
+      'wholesale': 'Wholesale',
+      'high_demand': 'High Demand',
+      'buyers_ordered_this_product': 'Buyers ordered this product',
+      'no_demand_alert': 'No Demand Alert',
+      'trending': 'Trending',
     },
 
     // KANNADA
     'kn': {
+      'no_demand_alert': 'ಯಾವುದೇ ಬೇಡಿಕೆ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ',
+      'trending': 'ಟ್ರೆಂಡಿಂಗ್',
+      'high_demand': 'ಹೆಚ್ಚಿನ ಬೇಡಿಕೆ',
+      'buyers_ordered_this_product':
+          'ಖರೀದಿದಾರರು ಈ ಉತ್ಪನ್ನವನ್ನು ಆರ್ಡರ್ ಮಾಡಿದ್ದಾರೆ',
+
       'login': 'ಲಾಗಿನ್',
       'email': 'ಇಮೇಲ್',
       'password': 'ಪಾಸ್ವರ್ಡ್',
@@ -161,10 +173,16 @@ class AppText {
       'cancel': 'ರದ್ದುಮಾಡಿ',
       'bid_placed_successfully': 'ಬಿಡ್ ಯಶಸ್ವಿಯಾಗಿ ಇಡಲಾಗಿದೆ',
       'market_and_my_bids': 'ಮಾರುಕಟ್ಟೆ ಮತ್ತು ನನ್ನ ಬಿಡ್‌ಗಳು',
+      'household': 'ಗೃಹ ಬಳಕೆ',
+      'wholesale': 'ಸಗಟು',
     },
 
     // HINDI
     'hi': {
+      'high_demand': 'अधिक मांग',
+      'buyers_ordered_this_product': 'खरीदारों ने इस उत्पाद का ऑर्डर किया',
+      'no_demand_alert': 'कोई मांग अलर्ट नहीं',
+      'trending': 'ट्रेंडिंग',
       'login': 'लॉगिन',
       'email': 'ईमेल',
       'password': 'पासवर्ड',
@@ -242,10 +260,18 @@ class AppText {
       'cancel': 'रद्द करें',
       'bid_placed_successfully': 'बोली सफलतापूर्वक लगाई गई',
       'market_and_my_bids': 'मार्केट और मेरी बोलियां',
+      'household': 'घरेलू',
+      'wholesale': 'थोक',
     },
 
     // TELUGU
     'te': {
+      'no_demand_alert': 'డిమాండ్ అలర్ట్ లేదు',
+      'trending': 'ట్రెండింగ్',
+      'high_demand': 'అధిక డిమాండ్',
+      'buyers_ordered_this_product':
+          'కొనుగోలుదారులు ఈ ఉత్పత్తిని ఆర్డర్ చేశారు',
+
       'login': 'లాగిన్',
       'email': 'ఇమెయిల్',
       'password': 'పాస్‌వర్డ్',
@@ -323,10 +349,15 @@ class AppText {
       'cancel': 'రద్దు చేయండి',
       'bid_placed_successfully': 'బిడ్ విజయవంతంగా పెట్టబడింది',
       'market_and_my_bids': 'మార్కెట్ మరియు నా బిడ్‌లు',
+      'household': 'గృహ వినియోగం',
+      'wholesale': 'టోకు',
     },
 
     // TAMIL
     'ta': {
+      'high_demand': 'அதிக தேவை',
+      'buyers_ordered_this_product':
+          'வாங்குபவர்கள் இந்த பொருளை ஆர்டர் செய்துள்ளனர்',
       'login': 'உள்நுழை',
       'email': 'மின்னஞ்சல்',
       'password': 'கடவுச்சொல்',
@@ -404,6 +435,10 @@ class AppText {
       'cancel': 'ரத்து செய்யவும்',
       'bid_placed_successfully': 'பிட் வெற்றிகரமாக இடப்பட்டது',
       'market_and_my_bids': 'மார்க்கெட் மற்றும் என் பிட்கள்',
+      'household': 'வீட்டு பயன்பாடு',
+      'wholesale': 'மொத்த விற்பனை',
+      'no_demand_alert': 'தேவை எச்சரிக்கை இல்லை',
+      'trending': 'டிரெண்டிங்',
     },
   };
 }

@@ -110,41 +110,6 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("GREEN CONNECT")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SecondScreen()),
-            );
-          },
-          child: Text("Go To Next Screen"),
-        ),
-      ),
-    );
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  const SecondScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Second Screen")),
-      body: Center(
-        child: Text("This is second screen", style: TextStyle(fontSize: 20)),
-      ),
-    );
-  }
-}
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -385,7 +350,7 @@ class FarmerDashboard extends StatelessWidget {
             ),
             dashboardItem(
               context,
-              tr(context, 'view_Bids'),
+              tr(context, 'view_bids'),
               Icons.gavel,
               Colors.green,
               const ViewBidsScreen(),
@@ -444,7 +409,7 @@ class BuyerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${tr(context, 'buyer_type')}($type)"),
+        title: Text("${tr(context, 'buyer_type')}(${tr(context, type)})"),
         backgroundColor: Colors.orange,
       ),
       body: Padding(
@@ -485,7 +450,14 @@ class BuyerDashboard extends StatelessWidget {
               context,
               tr(context, 'demand_alert'),
               Icons.notifications,
-              () {},
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DemandAlertScreen(),
+                  ),
+                );
+              },
             ),
             dashboardItem(
               context,
@@ -677,7 +649,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const BuyerRegisterScreen(type: "household"),
+                      BuyerRegisterScreen(type: tr(context, 'household')),
                 ),
               );
             },
@@ -690,7 +662,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const BuyerRegisterScreen(type: "wholesale"),
+                      BuyerRegisterScreen(type: tr(context, 'wholesale')),
                 ),
               );
             },
@@ -721,7 +693,7 @@ class _FarmerRegisterScreenState extends State<FarmerRegisterScreen> {
     userRole = "farmer";
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text("Farmer Registered")));
+    ).showSnackBar(SnackBar(content: Text(tr(context, 'farmers_register'))));
 
     Navigator.push(
       context,
@@ -732,7 +704,7 @@ class _FarmerRegisterScreenState extends State<FarmerRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(tr(context, 'farmer_register'))),
+      appBar: AppBar(title: Text(tr(context, 'farmers_register'))),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -750,7 +722,9 @@ class _FarmerRegisterScreenState extends State<FarmerRegisterScreen> {
             ),
             TextField(
               controller: phoneController,
-              decoration: InputDecoration(labelText: tr(context, 'phone_no')),
+              decoration: InputDecoration(
+                labelText: tr(context, 'phone_number'),
+              ),
             ),
             TextField(
               controller: locationController,
@@ -824,7 +798,9 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
             ),
             TextField(
               controller: phoneController,
-              decoration: InputDecoration(labelText: tr(context, 'phone_no')),
+              decoration: InputDecoration(
+                labelText: tr(context, 'phone_number'),
+              ),
             ),
             TextField(
               controller: addressController,
@@ -1004,7 +980,7 @@ class ProductListScreen extends StatelessWidget {
       body: productList.isEmpty
           ? Center(
               child: Text(
-                tr(context, 'no_product'),
+                tr(context, 'no_products'),
                 style: TextStyle(fontSize: 16),
               ),
             )
@@ -1099,7 +1075,7 @@ class OrderScreen extends StatelessWidget {
                     ),
                     trailing: ElevatedButton(
                       onPressed: () {
-                        order.status = tr(context, 'delevierd');
+                        order.status = tr(context, 'delivered');
                       },
                       child: Text(tr(context, 'mark_delivered')),
                     ),
@@ -1116,30 +1092,83 @@ class DemandScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, int> demandCount = {};
+
+    // Count product orders
+    for (var order in orderList) {
+      if (demandCount.containsKey(order.name)) {
+        demandCount[order.name] = demandCount[order.name]! + 1;
+      } else {
+        demandCount[order.name] = 1;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(tr(context, 'buyer_demand')),
         backgroundColor: Colors.green,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.show_chart, size: 80, color: Colors.grey),
 
-            SizedBox(height: 20),
+      body: demandCount.isEmpty
+          ? Center(
+              child: Text(
+                tr(context, 'no_demand_yet'),
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: demandCount.length,
+              itemBuilder: (context, index) {
+                String productName = demandCount.keys.elementAt(index);
 
-            Text(
-              tr(context, 'no_demands_yet'),
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+                int count = demandCount[productName]!;
+
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.trending_up,
+                      color: Colors.green,
+                      size: 35,
+                    ),
+
+                    title: Text(
+                      productName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+
+                    subtitle: Text(
+                      "$count ${tr(context, 'buyers_ordered_this_product')}",
+                    ),
+
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+
+                      child: Text(
+                        tr(context, 'high_demand'),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-
-            SizedBox(height: 10),
-
-            Text(tr(context, 'you_see'), style: TextStyle(color: Colors.grey)),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -1192,6 +1221,8 @@ class _MarketScreenState extends State<MarketScreen> {
             DropdownButtonFormField<Product>(
               value: selectedProduct,
               hint: Text(tr(context, 'select_product')),
+              initialValue: selectedProduct,
+
               items: productList.map((product) {
                 return DropdownMenuItem(
                   value: product,
@@ -1236,7 +1267,7 @@ class _MarketScreenState extends State<MarketScreen> {
             /// MARKET LIST
             Expanded(
               child: marketList.isEmpty
-                  ? Center(child: Text(tr(context, 'no_list')))
+                  ? Center(child: Text(tr(context, 'no_products')))
                   : ListView.builder(
                       itemCount: marketList.length,
                       itemBuilder: (context, index) {
@@ -1264,22 +1295,55 @@ class _MarketScreenState extends State<MarketScreen> {
 
 class RecentOrderScreen extends StatelessWidget {
   const RecentOrderScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Recent Orders")),
-      body: ListView(
-        children: const [
-          ListTile(
-            title: Text("Tomatoes"),
-            subtitle: Text("Ordered by Buyer A"),
-          ),
-          ListTile(
-            title: Text("Potatoes"),
-            subtitle: Text("Ordered by Buyer B"),
-          ),
-        ],
+      appBar: AppBar(
+        title: Text(tr(context, 'recent_orders')),
+        backgroundColor: Colors.green,
       ),
+
+      body: orderList.isEmpty
+          ? Center(
+              child: Text(
+                tr(context, 'no_order'),
+                style: TextStyle(fontSize: 16),
+              ),
+            )
+          : ListView.builder(
+              itemCount: orderList.length,
+              itemBuilder: (context, index) {
+                final order = orderList[index];
+
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.shopping_bag,
+                      color: Colors.green,
+                    ),
+
+                    title: Text(
+                      order.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    subtitle: Text(
+                      "${tr(context, 'buyer')}: ${order.buyerName}\n"
+                      "${tr(context, 'quantity')}: ${order.quantity}\n"
+                      "${tr(context, 'price')}: ₹${order.price}\n"
+                      "${tr(context, 'status')}: ${order.status}",
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
@@ -1342,7 +1406,7 @@ class BrowseProductsScreen extends StatelessWidget {
       body: productList.isEmpty
           ? Center(
               child: Text(
-                tr(context, 'no_product'),
+                tr(context, 'no_products'),
                 style: TextStyle(fontSize: 18),
               ),
             )
@@ -1461,7 +1525,7 @@ class CartScreen extends StatelessWidget {
                               name: item.name,
                               price: item.price,
                               quantity: item.quantity,
-                              buyerName: "Ram",
+                              buyerName: tr(context, 'ram'),
                             ),
                           );
                         }
@@ -1699,7 +1763,7 @@ class _MyBidScreenState extends State<MyBidScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr(context, 'market_my_bids')),
+        title: Text(tr(context, 'market_and_my_bids')),
         backgroundColor: Colors.orange,
       ),
 
@@ -1708,7 +1772,9 @@ class _MyBidScreenState extends State<MyBidScreen> {
           /// 🔹 MARKET PRODUCTS
           Expanded(
             child: marketList.isEmpty
-                ? Center(child: Text(tr(context, 'no_market_product')))
+                ? Center(
+                    child: Text(tr(context, 'no_market_product_available')),
+                  )
                 : ListView.builder(
                     itemCount: marketList.length,
                     itemBuilder: (context, index) {
@@ -1857,6 +1923,90 @@ class LanguageSelectionScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class DemandAlertScreen extends StatelessWidget {
+  const DemandAlertScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Map<String, int> demandMap = {};
+
+    // Count orders
+    for (var order in orderList) {
+      if (demandMap.containsKey(order.name)) {
+        demandMap[order.name] = demandMap[order.name]! + 1;
+      } else {
+        demandMap[order.name] = 1;
+      }
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tr(context, 'demand_alert')),
+        backgroundColor: Colors.orange,
+      ),
+
+      body: demandMap.isEmpty
+          ? Center(
+              child: Text(
+                tr(context, 'no_demand_alert'),
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: demandMap.length,
+              itemBuilder: (context, index) {
+                String product = demandMap.keys.elementAt(index);
+
+                int count = demandMap[product]!;
+
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.notifications_active,
+                      color: Colors.orange,
+                      size: 35,
+                    ),
+
+                    title: Text(
+                      product,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+
+                    subtitle: Text("$count ${tr(context, 'recent_orders')}"),
+
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+
+                      child: Text(
+                        tr(context, 'trending'),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
