@@ -419,7 +419,12 @@ class BuyerDashboard extends StatelessWidget {
           crossAxisSpacing: 15,
           mainAxisSpacing: 15,
           children: [
-            dashboardItem(context, tr(context, 'search'), Icons.search, () {}),
+            dashboardItem(context, tr(context, 'search'), Icons.search, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
+              );
+            }),
             dashboardItem(
               context,
               tr(context, 'browse_product'),
@@ -471,7 +476,7 @@ class BuyerDashboard extends StatelessWidget {
               },
             ),
 
-            if (type == "wholesale")
+            if (type.toLowerCase() == "wholesale")
               dashboardItem(context, tr(context, 'my_bid'), Icons.gavel, () {
                 Navigator.push(
                   context,
@@ -648,8 +653,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      BuyerRegisterScreen(type: tr(context, 'household')),
+                  builder: (context) => BuyerRegisterScreen(type: "household"),
                 ),
               );
             },
@@ -661,8 +665,7 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      BuyerRegisterScreen(type: tr(context, 'wholesale')),
+                  builder: (context) => BuyerRegisterScreen(type: "wholesale"),
                 ),
               );
             },
@@ -772,7 +775,7 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
     userRole = "buyer";
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("${widget.type} ${tr(context, 'buyer_registerd')}"),
+        content: Text("${widget.type}   ${tr(context, 'buyer_registerd')}"),
       ),
     );
 
@@ -787,7 +790,7 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("${widget.type}${tr(context, 'register')}")),
+      appBar: AppBar(title: Text("${widget.type} ${tr(context, 'register')}")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -1419,6 +1422,18 @@ class BrowseProductsScreen extends StatelessWidget {
                   margin: const EdgeInsets.all(10),
                   elevation: 4,
                   child: ListTile(
+                    leading: product.image != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              product.image!,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Icon(Icons.image, size: 50),
+
                     title: Text(
                       product.name,
                       style: const TextStyle(
@@ -1426,9 +1441,11 @@ class BrowseProductsScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+
                     subtitle: Text(
                       "${tr(context, 'price')}: ₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity}",
                     ),
+
                     trailing: IconButton(
                       icon: const Icon(
                         Icons.add_shopping_cart,
@@ -1437,6 +1454,7 @@ class BrowseProductsScreen extends StatelessWidget {
                       onPressed: () {
                         product.cartQty = 1;
                         cartList.add(product);
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -2007,6 +2025,93 @@ class DemandAlertScreen extends StatelessWidget {
                 );
               },
             ),
+    );
+  }
+}
+
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  final searchController = TextEditingController();
+
+  List<Product> filteredProducts = productList;
+
+  void searchProduct(String value) {
+    setState(() {
+      filteredProducts = productList
+          .where(
+            (product) =>
+                product.name.toLowerCase().contains(value.toLowerCase()),
+          )
+          .toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tr(context, 'search')),
+        backgroundColor: Colors.orange,
+      ),
+
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: TextField(
+              controller: searchController,
+              onChanged: searchProduct,
+              decoration: InputDecoration(
+                hintText: "${tr(context, 'search')}",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredProducts.isEmpty
+                ? Center(child: Text(tr(context, 'no_products')))
+                : ListView.builder(
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = filteredProducts[index];
+
+                      return Card(
+                        margin: const EdgeInsets.all(10),
+                        child: ListTile(
+                          leading: product.image != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    product.image!,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Icon(Icons.image),
+
+                          title: Text(product.name),
+
+                          subtitle: Text(
+                            "₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity}",
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
