@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'app_text.dart';
+import 'screens/price_prediction_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 String tr(BuildContext context, String key) {
   String lang = Localizations.localeOf(context).languageCode;
@@ -105,7 +107,93 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const LoginScreen(),
+      home: const SplashScreen(),
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// FADE ANIMATION
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    );
+
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_controller);
+
+    _controller.forward();
+
+    /// MOVE TO LOGIN SCREEN
+    Future.delayed(const Duration(seconds: 10), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.green[50],
+      body: Center(
+        child: FadeTransition(
+          opacity: _animation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              /// LOGO
+              Image.asset(
+                'assets/logo.png',
+                height: 190,
+                width: 190,
+              ),
+
+              const SizedBox(height: 20),
+
+              /// APP NAME
+
+              const SizedBox(height: 10),
+
+              /// CAPTION
+              const Text(
+                "Farm to Family",
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.black54,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -143,7 +231,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green[50],
-
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -158,7 +245,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 30),
-
             TextField(
               controller: emailController,
               decoration: const InputDecoration(
@@ -166,9 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 20),
-
             TextField(
               controller: passwordController,
               obscureText: true,
@@ -177,9 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 30),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -306,9 +388,21 @@ class FarmerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr(context, "farmer_dashboard")),
-        backgroundColor: Colors.green,
-      ),
+          title: Text(tr(context, "farmer_dashboard")),
+          backgroundColor: Colors.green,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginScreen(),
+                  ),
+                );
+              },
+            ),
+          ]),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: GridView.count(
@@ -414,6 +508,19 @@ class BuyerDashboard extends StatelessWidget {
       appBar: AppBar(
         title: Text("${tr(context, 'buyer_type')}(${tr(context, type)})"),
         backgroundColor: Colors.orange,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -478,7 +585,6 @@ class BuyerDashboard extends StatelessWidget {
                 );
               },
             ),
-
             if (type.toLowerCase() == "wholesale")
               dashboardItem(context, tr(context, 'my_bid'), Icons.gavel, () {
                 Navigator.push(
@@ -606,7 +712,6 @@ class RegisterRoleScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 30),
-
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -618,9 +723,7 @@ class RegisterRoleScreen extends StatelessWidget {
               },
               child: const Text("Farmer 🌾"),
             ),
-
             const SizedBox(height: 20),
-
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -662,7 +765,6 @@ class BuyerTypeRegisterScreen extends StatelessWidget {
             },
             child: Text("${tr(context, 'household')} 🏠"),
           ),
-
           ElevatedButton(
             onPressed: () {
               Navigator.push(
@@ -719,7 +821,6 @@ class _FarmerRegisterScreenState extends State<FarmerRegisterScreen> {
               controller: nameController,
               decoration: InputDecoration(labelText: tr(context, 'name')),
             ),
-
             TextField(
               controller: farmController,
               decoration: InputDecoration(
@@ -744,9 +845,7 @@ class _FarmerRegisterScreenState extends State<FarmerRegisterScreen> {
               controller: passwordController,
               decoration: InputDecoration(labelText: tr(context, 'password')),
             ),
-
             const SizedBox(height: 20),
-
             ElevatedButton(
               onPressed: register,
               child: Text(tr(context, 'register')),
@@ -820,9 +919,7 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
               controller: passwordController,
               decoration: InputDecoration(labelText: tr(context, 'password')),
             ),
-
             const SizedBox(height: 20),
-
             ElevatedButton(
               onPressed: register,
               child: Text(tr(context, 'register')),
@@ -836,6 +933,7 @@ class _BuyerRegisterScreenState extends State<BuyerRegisterScreen> {
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
+
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
 }
@@ -844,9 +942,30 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final quantityController = TextEditingController();
+
   File? _image;
+  String? selectedCrop;
+
+  List<String> cropList = [
+    'rice',
+    'wheat',
+    'tomato',
+    'onion',
+    'potato',
+    'carrot',
+    'cabbage',
+    'corn',
+    'sugarcane',
+    'cotton',
+    'banana',
+    'mango',
+  ];
+
   Future<void> pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+
     if (picked != null) {
       setState(() {
         _image = File(picked.path);
@@ -860,18 +979,29 @@ class _AddProductScreenState extends State<AddProductScreen> {
     String qty = quantityController.text.trim();
 
     if (name.isEmpty || price.isEmpty || qty.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(tr(context, 'fill_fields'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(tr(context, 'fill_fields')),
+        ),
+      );
       return;
     }
+
     productList.add(
-      Product(name: name, price: price, quantity: qty, image: _image),
+      Product(
+        name: name,
+        price: price,
+        quantity: qty,
+        image: _image,
+      ),
     );
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(tr(context, 'product_added'))));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(tr(context, 'product_added')),
+      ),
+    );
+
     nameController.clear();
     priceController.clear();
     quantityController.clear();
@@ -879,6 +1009,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
     setState(() {
       _image = null;
     });
+  }
+
+  /// OPEN SMART PRICE PREDICTION WEBPAGE
+  void openPricePrediction() async {
+    final Uri url = Uri.parse("http://127.0.0.1:5000");
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(
+        url,
+        webOnlyWindowName: "_blank",
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Could not open Smart Price Prediction"),
+        ),
+      );
+    }
   }
 
   @override
@@ -892,6 +1040,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            /// IMAGE PICKER
             GestureDetector(
               onTap: pickImage,
               child: Container(
@@ -906,28 +1055,77 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.camera_alt, size: 50),
-                          SizedBox(height: 10),
-                          Text(tr(context, 'upload_image')),
+                          const Icon(
+                            Icons.camera_alt,
+                            size: 50,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            tr(context, 'upload_image'),
+                          ),
                         ],
                       )
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.file(_image!, fit: BoxFit.cover),
+                        child: Image.file(
+                          _image!,
+                          fit: BoxFit.cover,
+                        ),
                       ),
               ),
             ),
+
             const SizedBox(height: 20),
-            TextField(
-              controller: nameController,
+
+            /// SMART PRICE PREDICTION BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: openPricePrediction,
+                icon: const Icon(Icons.show_chart),
+                label: Text(
+                  tr(context, 'smart_price_prediction'),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.all(15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// PRODUCT NAME
+            DropdownButtonFormField<String>(
+              value: selectedCrop,
               decoration: InputDecoration(
-                labelText: tr(context, 'product_name'),
+                labelText: tr(context, 'select_crop'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
+              items: cropList.map((crop) {
+                return DropdownMenuItem(
+                  value: crop,
+                  child: Text(
+                    tr(context, crop),
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCrop = value;
+                  nameController.text = value!;
+                });
+              },
             ),
+
             const SizedBox(height: 15),
+
+            /// PRICE
             TextField(
               controller: priceController,
               keyboardType: TextInputType.number,
@@ -938,7 +1136,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
             ),
+
             const SizedBox(height: 15),
+
+            /// QUANTITY
             TextField(
               controller: quantityController,
               keyboardType: TextInputType.number,
@@ -949,7 +1150,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
             ),
+
             const SizedBox(height: 25),
+
+            /// ADD PRODUCT BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -963,7 +1167,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
                 child: Text(
                   tr(context, 'add_product'),
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
@@ -985,9 +1189,23 @@ class ProductListScreen extends StatelessWidget {
       ),
       body: productList.isEmpty
           ? Center(
-              child: Text(
-                tr(context, 'no_products'),
-                style: TextStyle(fontSize: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_products'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             )
           : ListView.builder(
@@ -1067,7 +1285,26 @@ class OrderScreen extends StatelessWidget {
         backgroundColor: Colors.orange,
       ),
       body: orderList.isEmpty
-          ? Center(child: Text(tr(context, 'no_order')))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_order'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
           : ListView.builder(
               itemCount: orderList.length,
               itemBuilder: (context, index) {
@@ -1114,12 +1351,25 @@ class DemandScreen extends StatelessWidget {
         title: Text(tr(context, 'buyer_demand')),
         backgroundColor: Colors.green,
       ),
-
       body: demandCount.isEmpty
           ? Center(
-              child: Text(
-                tr(context, 'no_demand_yet'),
-                style: TextStyle(fontSize: 18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.trending_up,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_demand_yet'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             )
           : ListView.builder(
@@ -1135,14 +1385,12 @@ class DemandScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   child: ListTile(
                     leading: const Icon(
                       Icons.trending_up,
                       color: Colors.green,
                       size: 35,
                     ),
-
                     title: Text(
                       productName,
                       style: const TextStyle(
@@ -1150,22 +1398,18 @@ class DemandScreen extends StatelessWidget {
                         fontSize: 18,
                       ),
                     ),
-
                     subtitle: Text(
                       "$count ${tr(context, 'buyers_ordered_this_product')}",
                     ),
-
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 6,
                       ),
-
                       decoration: BoxDecoration(
                         color: Colors.green,
                         borderRadius: BorderRadius.circular(20),
                       ),
-
                       child: Text(
                         tr(context, 'high_demand'),
                         style: TextStyle(color: Colors.white),
@@ -1218,7 +1462,6 @@ class _MarketScreenState extends State<MarketScreen> {
         title: Text(tr(context, 'sell_market')),
         backgroundColor: Colors.green,
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -1228,7 +1471,6 @@ class _MarketScreenState extends State<MarketScreen> {
               value: selectedProduct,
               hint: Text(tr(context, 'select_product')),
               initialValue: selectedProduct,
-
               items: productList.map((product) {
                 return DropdownMenuItem(
                   value: product,
@@ -1273,7 +1515,26 @@ class _MarketScreenState extends State<MarketScreen> {
             /// MARKET LIST
             Expanded(
               child: marketList.isEmpty
-                  ? Center(child: Text(tr(context, 'no_products')))
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 90,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 15),
+                          Text(
+                            tr(context, 'no_products'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   : ListView.builder(
                       itemCount: marketList.length,
                       itemBuilder: (context, index) {
@@ -1309,12 +1570,25 @@ class RecentOrderScreen extends StatelessWidget {
         title: Text(tr(context, 'recent_orders')),
         backgroundColor: Colors.green,
       ),
-
       body: orderList.isEmpty
           ? Center(
-              child: Text(
-                tr(context, 'no_order'),
-                style: TextStyle(fontSize: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_order'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             )
           : ListView.builder(
@@ -1328,18 +1602,15 @@ class RecentOrderScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   child: ListTile(
                     leading: const Icon(
                       Icons.shopping_bag,
                       color: Colors.green,
                     ),
-
                     title: Text(
                       order.name,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-
                     subtitle: Text(
                       "${tr(context, 'buyer')}: ${order.buyerName}\n"
                       "${tr(context, 'quantity')}: ${order.quantity}\n"
@@ -1365,7 +1636,26 @@ class BuyerProductsScreen extends StatelessWidget {
         backgroundColor: Colors.orange,
       ),
       body: productList.isEmpty
-          ? Center(child: Text(tr(context, 'no_product')))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_products'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
           : ListView.builder(
               itemCount: productList.length,
               itemBuilder: (context, index) {
@@ -1378,7 +1668,6 @@ class BuyerProductsScreen extends StatelessWidget {
                     subtitle: Text(
                       "${tr(context, 'price')}: ₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity} ${tr(context, 'kg')}",
                     ),
-
                     trailing: ElevatedButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -1411,9 +1700,23 @@ class BrowseProductsScreen extends StatelessWidget {
       ),
       body: productList.isEmpty
           ? Center(
-              child: Text(
-                tr(context, 'no_products'),
-                style: TextStyle(fontSize: 18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_products'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             )
           : ListView.builder(
@@ -1436,7 +1739,6 @@ class BrowseProductsScreen extends StatelessWidget {
                             ),
                           )
                         : const Icon(Icons.image, size: 50),
-
                     title: Text(
                       product.name,
                       style: const TextStyle(
@@ -1444,11 +1746,9 @@ class BrowseProductsScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     subtitle: Text(
                       "${tr(context, 'price')}: ₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity}",
                     ),
-
                     trailing: IconButton(
                       icon: const Icon(
                         Icons.add_shopping_cart,
@@ -1485,7 +1785,26 @@ class CartScreen extends StatelessWidget {
         backgroundColor: Colors.orange,
       ),
       body: cartList.isEmpty
-          ? Center(child: Text(tr(context, 'cart_is_empty')))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'cart_is_empty'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
           : Column(
               children: [
                 Expanded(
@@ -1500,7 +1819,6 @@ class CartScreen extends StatelessWidget {
                           subtitle: Text(
                             "${product.price}${tr(context, 'quantity')}:${product.quantity}",
                           ),
-
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -1575,7 +1893,26 @@ class MyOrderScreen extends StatelessWidget {
         backgroundColor: Colors.orange,
       ),
       body: orderList.isEmpty
-          ? Center(child: Text(tr(context, 'no_order')))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_order'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
           : ListView.builder(
               itemCount: orderList.length,
               itemBuilder: (context, index) {
@@ -1668,12 +2005,25 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
         title: Text(tr(context, 'bids_received')),
         backgroundColor: Colors.green,
       ),
-
       body: bidList.isEmpty
           ? Center(
-              child: Text(
-                tr(context, 'no_bids_yet'),
-                style: TextStyle(fontSize: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 90,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    tr(context, 'no_bids_yet'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             )
           : ListView.builder(
@@ -1687,19 +2037,16 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   child: ListTile(
                     leading: const Icon(
                       Icons.gavel,
                       color: Colors.green,
                       size: 30,
                     ),
-
                     title: Text(
                       bid.productName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1707,7 +2054,6 @@ class _ViewBidsScreenState extends State<ViewBidsScreen> {
                         Text("${tr(context, 'bid_price')}: ₹${bid.price}"),
                       ],
                     ),
-
                     trailing: ElevatedButton(
                       onPressed: () => acceptBid(index),
                       style: ElevatedButton.styleFrom(
@@ -1787,14 +2133,30 @@ class _MyBidScreenState extends State<MyBidScreen> {
         title: Text(tr(context, 'market_and_my_bids')),
         backgroundColor: Colors.orange,
       ),
-
       body: Column(
         children: [
           /// 🔹 MARKET PRODUCTS
           Expanded(
             child: marketList.isEmpty
                 ? Center(
-                    child: Text(tr(context, 'no_market_product_available')),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 90,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                          tr(context, 'no_market_product_available'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 : ListView.builder(
                     itemCount: marketList.length,
@@ -1808,7 +2170,6 @@ class _MyBidScreenState extends State<MyBidScreen> {
                           subtitle: Text(
                             "${tr(context, 'base_price')}: ₹${item.price}",
                           ),
-
                           trailing: ElevatedButton(
                             onPressed: () => openBidDialog(item.productName),
                             child: Text(tr(context, 'make_bid')),
@@ -1832,7 +2193,26 @@ class _MyBidScreenState extends State<MyBidScreen> {
 
           Expanded(
             child: bidList.isEmpty
-                ? Center(child: Text(tr(context, 'no_bids_yet')))
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.gavel_outlined,
+                          size: 90,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                          tr(context, 'no_bids_yet'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: bidList.length,
                     itemBuilder: (context, index) {
@@ -1876,7 +2256,6 @@ class LanguageSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green[50],
-
       appBar: AppBar(
         title: Text(
           AppText.translations[Localizations.localeOf(
@@ -1886,14 +2265,11 @@ class LanguageSelectionScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.green,
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(20),
-
         child: Column(
           children: [
             const SizedBox(height: 30),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -1901,9 +2277,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                 child: const Text("English"),
               ),
             ),
-
             const SizedBox(height: 15),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -1911,9 +2285,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                 child: const Text("ಕನ್ನಡ"),
               ),
             ),
-
             const SizedBox(height: 15),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -1921,9 +2293,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                 child: const Text("हिन्दी"),
               ),
             ),
-
             const SizedBox(height: 15),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -1931,9 +2301,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                 child: const Text("తెలుగు"),
               ),
             ),
-
             const SizedBox(height: 15),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -1969,7 +2337,6 @@ class DemandAlertScreen extends StatelessWidget {
         title: Text(tr(context, 'demand_alert')),
         backgroundColor: Colors.orange,
       ),
-
       body: demandMap.isEmpty
           ? Center(
               child: Text(
@@ -1990,14 +2357,12 @@ class DemandAlertScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   child: ListTile(
                     leading: const Icon(
                       Icons.notifications_active,
                       color: Colors.orange,
                       size: 35,
                     ),
-
                     title: Text(
                       product,
                       style: const TextStyle(
@@ -2005,20 +2370,16 @@ class DemandAlertScreen extends StatelessWidget {
                         fontSize: 18,
                       ),
                     ),
-
                     subtitle: Text("$count ${tr(context, 'recent_orders')}"),
-
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 5,
                       ),
-
                       decoration: BoxDecoration(
                         color: Colors.orange,
                         borderRadius: BorderRadius.circular(20),
                       ),
-
                       child: Text(
                         tr(context, 'trending'),
                         style: TextStyle(color: Colors.white),
@@ -2062,7 +2423,6 @@ class _SearchScreenState extends State<SearchScreen> {
         title: Text(tr(context, 'search')),
         backgroundColor: Colors.orange,
       ),
-
       body: Column(
         children: [
           Padding(
@@ -2079,10 +2439,28 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
-
           Expanded(
             child: filteredProducts.isEmpty
-                ? Center(child: Text(tr(context, 'no_products')))
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 90,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                          tr(context, 'no_products'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
@@ -2102,9 +2480,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                 )
                               : const Icon(Icons.image),
-
                           title: Text(product.name),
-
                           subtitle: Text(
                             "₹${product.price} | ${tr(context, 'quantity')}: ${product.quantity}",
                           ),
